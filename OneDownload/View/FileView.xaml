@@ -1,0 +1,42 @@
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:items="clr-namespace:OneDownload.Models.Json.Graph.Items"
+             x:Class="OneDownload.View.FileView">
+    
+    <ListView 
+        x:Name="FileList"
+        ItemsSource="{Binding}"
+        RowHeight="66"
+        VerticalOptions="Center"
+        x:DataType="items:DriveItems">
+        <ListView.ItemTemplate>
+            <DataTemplate>
+                <ViewCell>
+                    <Grid Padding="10" VerticalOptions="Center">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        
+                        <Label Grid.Column="1"
+                               Text="{Binding Name}"
+                               VerticalOptions="Center"
+                               FontSize="18"
+                               FontAttributes="Bold" />
+                        
+                        <ImageButton Grid.Row="0"
+                                     Grid.Column="0"
+                                     VerticalOptions="Center"
+                                     Scale="0.7"
+                                     Source="download.png"/>
+                    </Grid>
+                </ViewCell>
+            </DataTemplate>
+        </ListView.ItemTemplate>
+    </ListView>
+</ContentPage>
