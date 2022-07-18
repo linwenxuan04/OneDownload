@@ -1,4 +1,4 @@
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+﻿<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:items="clr-namespace:OneDownload.Models.Json.Graph.Items"
              x:Class="OneDownload.View.FileView">
@@ -15,26 +15,47 @@
                     <Grid Padding="10" VerticalOptions="Center">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
                         
                         <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
                         
-                        <Label Grid.Column="1"
-                               Text="{Binding Name}"
-                               VerticalOptions="Center"
-                               FontSize="18"
-                               FontAttributes="Bold" />
+                        <Label 
+                            Grid.Column="0"
+                            Text="{Binding Name}"
+                            VerticalOptions="Center"
+                            FontSize="18"
+                            FontAttributes="Bold" />
                         
-                        <ImageButton Grid.Row="0"
-                                     Grid.Column="0"
-                                     VerticalOptions="Center"
-                                     Scale="0.7"
-                                     Source="download.png"/>
+                        <ImageButton 
+                            Grid.Row="0"
+                            Grid.Column="1"
+                            VerticalOptions="Center"
+                            Scale="0.65"
+                            Clicked="DownloadFile"
+                            Source="download.png" />
+                        
+                        <ImageButton 
+                            Grid.Row="0"
+                            Grid.Column="2"
+                            VerticalOptions="Center"
+                            Scale="0.65"
+                            Source="download.png" />
+                        
+                        <ImageButton 
+                            Grid.Row="0"
+                            Grid.Column="3"
+                            VerticalOptions="Center"
+                            Scale="0.65"
+                            TranslationY="1"
+                            Source="trash.png" />
                     </Grid>
+                    
+                    
                 </ViewCell>
             </DataTemplate>
         </ListView.ItemTemplate>

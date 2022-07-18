@@ -4,26 +4,24 @@ using Newtonsoft.Json;
 
 namespace OneDownload.Core;
 
-public class DownloadManager
+public static class DownloadManager
 {
-    public static Dictionary<int, DownloadService> DownloadQueue;
-    public static Dictionary<int, DownloadPackage> PauseQueue;
+    public static Dictionary<int, DownloadService> DownloadQueue = new();
+    public static Dictionary<int, DownloadPackage> PauseQueue = new();
 
     public static List<DownloadService> DownloadTasks => DownloadQueue.Values.ToList();
 
-    static DownloadManager()
-    {
-        DownloadQueue = new Dictionary<int, DownloadService>();
-    }
-    
     public static void CreateTask(DownloadEntity downloadEntity)
     {
         if (DownloadQueue.ContainsKey(downloadEntity.GetHashCode())) return;
         
-        var service = new DownloadService();
+        var service = new DownloadService(GetConfig());
+        Console.WriteLine(downloadEntity.GetHashCode());
         DownloadQueue.Add(downloadEntity.GetHashCode(), service);
-        
-        service.DownloadFileTaskAsync(downloadEntity.Url, downloadEntity.Filepath);
+
+        Console.WriteLine(downloadEntity.Url);
+        var task = service.DownloadFileTaskAsync(downloadEntity.Url, downloadEntity.Filepath);
+        task.Start();
     }
     
     public static void PauseTask(DownloadEntity downloadEntity)
@@ -47,6 +45,41 @@ public class DownloadManager
         
         PauseQueue.Remove(downloadEntity.GetHashCode());
     }
+    
+    public static void RemoveTask(DownloadEntity downloadEntity)
+    {
+        if (!DownloadQueue.ContainsKey(downloadEntity.GetHashCode())) return;
+        
+        var service = DownloadQueue[downloadEntity.GetHashCode()];
+        service.CancelAsync();
+        DownloadQueue.Remove(downloadEntity.GetHashCode());
+    }
+    
+    public static void PauseAllTask()
+    {
+        foreach (var (hash, service) in DownloadQueue)
+        {
+            var package = service.Package;
+            PauseQueue.Add(hash, package);
+            service.CancelAsync();
+        }
+    }
+    
+    public static void ResumeAllTask()
+    {
+        foreach (var (hash, package) in PauseQueue)
+        {
+            var service = DownloadQueue[hash];
+            service.DownloadFileTaskAsync(package);
+        }
+        PauseQueue.Clear();
+    }
+    
+    public static void RemoveAllTask()
+    {
+        foreach (var (_, service) in DownloadQueue) service.CancelAsync();
+        DownloadQueue.Clear();
+    }
 
     private static DownloadConfiguration GetConfig()
     {
@@ -55,11 +88,19 @@ public class DownloadManager
             var config = new DownloadConfiguration()
             {
                 ParallelDownload = true,
-                ChunkCount = 16
+                ChunkCount = 16,
+                TempDirectory = Path.GetTempPath(),
+                TempFilesExtension = ".onedownload",
+                OnTheFlyDownload = false,
             };
             Preferences.Set("DownloadConfig", JsonConvert.SerializeObject(config));
             return config;
         }
         return JsonConvert.DeserializeObject<DownloadConfiguration>(Preferences.Get("DownloadConfig", null)!)!;
+    }
+    
+    public static void SetConfig(DownloadConfiguration config)
+    {
+        Preferences.Set("DownloadConfig", JsonConvert.SerializeObject(config));
     }
 }
